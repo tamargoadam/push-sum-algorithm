@@ -1,25 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "/Users/sakshichhabra/Desktop/project2/project2/project2.fsproj": {}
+    "C:\\Users\\tamar\\dev\\f-sharp\\project2\\project2.fsproj": {}
   },
   "projects": {
-    "/Users/sakshichhabra/Desktop/project2/project2/project2.fsproj": {
+    "C:\\Users\\tamar\\dev\\f-sharp\\project2\\project2.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/sakshichhabra/Desktop/project2/project2/project2.fsproj",
+        "projectUniqueName": "C:\\Users\\tamar\\dev\\f-sharp\\project2\\project2.fsproj",
         "projectName": "project2",
-        "projectPath": "/Users/sakshichhabra/Desktop/project2/project2/project2.fsproj",
-        "packagesPath": "/Users/sakshichhabra/.nuget/packages/",
-        "outputPath": "/Users/sakshichhabra/Desktop/project2/project2/obj/",
+        "projectPath": "C:\\Users\\tamar\\dev\\f-sharp\\project2\\project2.fsproj",
+        "packagesPath": "C:\\Users\\tamar\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\tamar\\dev\\f-sharp\\project2\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/sakshichhabra/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\tamar\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -31,6 +33,15 @@
       "frameworks": {
         "netcoreapp3.1": {
           "dependencies": {
+            "Akka": {
+              "target": "Package",
+              "version": "[*, )"
+            },
+            "Akka.FSharp": {
+              "target": "Package",
+              "version": "[1.4.10, )",
+              "generatePathProperty": true
+            },
             "FSharp.Core": {
               "target": "Package",
               "version": "[4.7.2, )",
@@ -52,7 +63,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.402/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
         }
       }
     }
