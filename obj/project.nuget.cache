@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "fxAZ11UiJrNDvMSHUPMQPkuXz9nVhs+5l8DZzjZwdx/ypRwccRy3/b1f+wRx+q3OOZM9OK8TziXrFzxrniKlIw==",
+  "success": true,
+  "projectFilePath": "/Users/sakshichhabra/Desktop/project2/project2/project2.fsproj",
+  "expectedPackageFiles": [
+    "/Users/sakshichhabra/.nuget/packages/fsharp.core/4.7.2/fsharp.core.4.7.2.nupkg.sha512"
+  ],
+  "logs": []
+}
