@@ -1,38 +1,36 @@
 ﻿// Learn more about F# at http://fsharp.org
+module Main
 
+open Gossip
 open System
-open Akka.Actor
 open Akka.FSharp
 
-let system = ActorSystem.Create("FSharp")
 
 let getNextPerfectSq(numNodes) = 
     numNodes
 
 
-let startProtocol(algorithm) = 
-    if algorithm = "gossip" then
+let startProtocol algorithm actorRefArr = 
+    // if algorithm = "gossip" then
         Console.WriteLine("Using Gossip Algorithm")
+        startGossip actorRefArr
            
-    elif algorithm = "push-sum" then
-        Console.WriteLine("Using Push Sum Algorithm")
+    // elif algorithm = "push-sum" then
+    //     Console.WriteLine("Using Push Sum Algorithm")
         
-    else    
-        Console.WriteLine("Enter either gossip or push-sum")
+    // else    
+    //     Console.WriteLine("Enter either gossip or push-sum")
 
-
-let workerActor (neighbors: int[]) (mailbox : Actor<'a>) =    
-    neighbors
 
 let fullNetwork numNodes = 
     let actorRefArr = [|
         for i in 0 .. numNodes-1 -> 
-            (spawn system ("worker"+i.ToString()) (workerActor [|for i in 0 .. numNodes-1 -> i|]))
+            (spawn system ("worker"+i.ToString()) (gossipActor [|for i in 0 .. numNodes-1 -> i|]))
     |]
     actorRefArr
 
-let buildTopology(topology, numNodes) = 
-    numNodes
+let buildTopology topology numNodes = 
+    fullNetwork numNodes
 
 
 [<EntryPoint>]
@@ -49,11 +47,11 @@ let main argv =
         if topology = "2D" || topology = "imp2D" then
             numNodes <- getNextPerfectSq(numNodes)
 
-        buildTopology topology numNodes
+        let actorRefArr = buildTopology topology numNodes
 
         let stopWatch = System.Diagnostics.Stopwatch.StartNew()
 
-        startProtocol(algorithm)
+        let p = startProtocol algorithm actorRefArr
 
         stopWatch.Stop()
 

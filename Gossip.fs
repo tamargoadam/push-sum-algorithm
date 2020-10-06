@@ -1,3 +1,5 @@
+module Gossip
+
 open System
 open Akka.Actor
 open Akka.FSharp
@@ -5,7 +7,7 @@ open Akka.FSharp
 let system = ActorSystem.Create("FSharp")
 
 
-let startGossip (actorRefArr: Actor[]) rumor = 
+let startGossip (actorRefArr: IActorRef[]) rumor = 
     let median = actorRefArr.Length/2
     actorRefArr.[median] <! rumor
 
@@ -13,8 +15,8 @@ let startGossip (actorRefArr: Actor[]) rumor =
 let gossipSend (neighbors: int[]) rumor = 
     let rand = new Random()
     let index = rand.Next(0, neighbors.Length-1)
-    let aref2 = system.ActorSelection("akka://my-system/user/my-actor")
-    actorRefArr.[neighbors.[index]] <! rumor
+    let target = system.ActorSelection("akka://FSharp/user/worker"+index.ToString())
+    target <! rumor
 
 
 let gossipActor neighbors (mailbox : Actor<'a>) =    
@@ -23,8 +25,10 @@ let gossipActor neighbors (mailbox : Actor<'a>) =
         actor {
             let! msg = mailbox.Receive()
             gossipSend neighbors msg
-            counter += 1
+            counter <- counter + 1
             if counter < 10 then 
-                return! loop() 
+                return! loop()
+            else
+                Console.WriteLine("done")
         }
     loop()
