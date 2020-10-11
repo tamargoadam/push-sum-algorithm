@@ -10,7 +10,7 @@ let system = ActorSystem.Create("FSharp")
 let startGossip (actorRefArr: IActorRef[]) rumor = 
     let median = actorRefArr.Length/2
     actorRefArr.[median] <! rumor
-
+    
 
 let gossipSend (neighbors: int[]) rumor = 
     let rand = new Random()
