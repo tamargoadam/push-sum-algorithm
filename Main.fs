@@ -6,7 +6,7 @@ open System
 open Akka.FSharp
 
 open System.Collections.Generic
-let neighbors = new Dictionary<int, Array>()
+let neighbors = new Dictionary<int, int []>( )
 
 let getNextPerfectSq(numNodes) = 
     let sqroot:int = int(Math.Ceiling(sqrt(float(numNodes)))**2.0)
@@ -92,25 +92,29 @@ let impTwoD_network numNodes sqroot =
         neighbors.Add(i, adjArray)
 
 
-
-let startProtocol algorithm actorRefArr = 
-    if algorithm = "gossip" then
-        Console.WriteLine("Using Gossip Algorithm")
-        // startGossip actorRefArr
-           
-    elif algorithm = "push-sum" then
-        Console.WriteLine("Using Push Sum Algorithm")
-        
-    else    
-        Console.WriteLine("Enter either gossip or push-sum")
-
-
-let fullNetwork numNodes = 
+let createRefArr(numNodes: int) =
+    
     let actorRefArr = [|
         for i in 0 .. numNodes-1 -> 
-            (spawn system ("worker"+i.ToString()) (gossipActor [|for i in 0 .. numNodes-1 -> i|]))
+
+            (spawn system ("worker"+i.ToString()) (gossipActor (neighbors.Item(i))))
     |]
     actorRefArr
+
+let startProtocol(algorithm, numNodes: int) = 
+    // if algorithm = "gossip" then
+    
+    let actorRefArr = createRefArr(numNodes)
+    startGossip actorRefArr "gossip"
+           
+    // elif algorithm = "push-sum" then
+    //     Console.WriteLine("Using Push Sum Algorithm")
+        
+    // else    
+    //     Console.WriteLine("Enter either gossip or push-sum")
+
+
+
 
 let buildTopology topology numNodes = 
     if topology = "full" then
@@ -140,12 +144,13 @@ let main argv =
 
         if topology = "2D" || topology = "imp2D" then
             numNodes <- getNextPerfectSq(numNodes)
-
-        let actorRefArr = buildTopology topology numNodes
+        
+        
+        buildTopology topology numNodes
 
         let stopWatch = System.Diagnostics.Stopwatch.StartNew()
 
-        let p = startProtocol algorithm actorRefArr
+        startProtocol(algorithm, numNodes)
 
         stopWatch.Stop()
 
