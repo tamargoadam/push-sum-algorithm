@@ -24,13 +24,14 @@ let getRandNum min max =
 let pushSumSend (neighbors: int[]) rumor = 
     let index = getRandNum 0 neighbors.Length    
     let target = actorRef.[index]
+    // Console.WriteLine("{0}", index)
     target <! rumor
 
 
 
 let checkConverge (oldVals: float * float) (newVals: float * float) = 
     let oldV = fst(oldVals)/snd(oldVals)
-    let newV = fst(newVals)/snd(newVals)
+    let newV = ((fst(oldVals) + fst(newVals))/2.0)/((snd(oldVals) + snd(newVals))/2.0)
     oldV - newV < 10.0**(-10.0) && newV - oldV < 10.0**(-10.0)
 
 
