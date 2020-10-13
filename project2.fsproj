@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Gossip.fs" />
+    <Compile Include="PushSum.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,11 +2,14 @@
 module Main
 
 open Gossip
+open PushSum
 open System
 open Akka.Actor
 open Akka.FSharp
-
 open System.Collections.Generic
+
+let system = ActorSystem.Create("FSharp")
+
 let neighbors = new Dictionary<int, int []>( )
 
 let getNextPerfectSq(numNodes) = 
@@ -164,7 +167,7 @@ let main argv =
 
         let stopWatch = System.Diagnostics.Stopwatch.StartNew()
 
-        spawn system "listenerActor" (listenerActor algorithm numNodes)
+        spawn system "listenerActor" (listenerActor algorithm numNodes) |> ignore
 
         let mutable x = 0
         for i in 0..1000000000 do
@@ -172,7 +175,7 @@ let main argv =
 
         stopWatch.Stop()
 
-        Console.WriteLine("{0}", stopWatch.Elapsed.TotalMilliseconds)
+        Console.WriteLine("Time to complete: {0} ms", stopWatch.Elapsed.TotalMilliseconds)
 
         
     

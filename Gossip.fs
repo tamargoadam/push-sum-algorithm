@@ -4,8 +4,6 @@ open System
 open Akka.Actor
 open Akka.FSharp
 
-let system = ActorSystem.Create("FSharp")
-
 let mutable actorRef : IActorRef list = []
 
 let startGossip (actorRefArr: IActorRef[]) rumor = 
