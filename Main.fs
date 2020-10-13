@@ -96,26 +96,32 @@ let impTwoD_network numNodes sqroot =
         neighbors.Add(i, adjArray)
 
 
-let createRefArr (numNodes: int) (mailbox : Actor<'a>)=
-    
-    let actorRefArr = [|
-        for i in 0 .. numNodes-1 -> 
-            (spawn mailbox ("worker"+i.ToString()) (gossipActor (neighbors.Item(i))))
-    |]
-    actorRefArr
+let createRefArr (algorithm: string) (numNodes: int) (mailbox : Actor<'a>)=   
+    if algorithm = "gossip" then
+        [|
+            for i in 0 .. numNodes-1 -> 
+                (spawn mailbox ("worker"+i.ToString()) (gossipActor (neighbors.Item(i))))
+        |]
+    else
+        [|
+            for i in 0 .. numNodes-1 -> 
+                (spawn mailbox ("worker"+i.ToString()) (pushSumActor (float i) (neighbors.Item(i))))
+        |]
 
 let startProtocol (algorithm: string) (refArr: IActorRef []) (numNodes: int) = 
-    // if algorithm = "gossip" then
-    startGossip refArr "gossip"
+    if algorithm = "gossip" then
+        Console.WriteLine("Using Gossip Algorithm")
+        startGossip refArr "rumor"
            
-    // elif algorithm = "push-sum" then
-    //     Console.WriteLine("Using Push Sum Algorithm")
-        
-    // else    
-    //     Console.WriteLine("Enter either gossip or push-sum")
+    elif algorithm = "push-sum" then
+        Console.WriteLine("Using Push Sum Algorithm")
+        startPushSum refArr
 
-let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<'a>)= 
-    let refArr = createRefArr numNodes mailbox
+    else    
+        Console.WriteLine("Enter either gossip or push-sum")
+
+let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<_>)= 
+    let refArr = createRefArr algorithm numNodes mailbox
     startProtocol algorithm refArr numNodes
     let mutable numHeard = 0
     let rec loop () = 
@@ -124,10 +130,16 @@ let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<'a>)=
             let sender = mailbox.Sender()
             numHeard <- numHeard + 1
             if numHeard < numNodes then 
-                // Console.WriteLine("{0} heard the rumor!. ({1})", sender, numHeard)
+                if algorithm = "gossip" then
+                    Console.WriteLine("{0} heard the rumor, '{1}'!. ({2})", sender, msg, numHeard)
+                elif algorithm = "push-sum" then
+                    Console.WriteLine("{0} converged to the sum, {1}!. ({2})", sender, msg, numHeard)
                 return! loop()
             else
-                Console.WriteLine("All {0} nodes heard the rumor!", numHeard)
+                if algorithm = "gossip" then
+                    Console.WriteLine("All {0} nodes heard the rumor!", numHeard)
+                elif algorithm = "push-sum" then
+                    Console.WriteLine("All {0} nodes converged to the sum! (~{1})", numHeard, msg)
         }
     loop()
 

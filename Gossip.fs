@@ -39,7 +39,7 @@ let gossipActor (neighbors: int[]) (mailbox : Actor<'a>) =
             if counter < 50 then
                 // let listener know this node has heard the rumor
                 if counter = 1 then
-                    mailbox.Context.Parent <! "done"
+                    mailbox.Context.Parent <! msg
                 return! loop()
         }
     loop()

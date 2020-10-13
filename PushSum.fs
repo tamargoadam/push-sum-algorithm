@@ -43,12 +43,13 @@ let pushSumActor (value: float) (neighbors: int[]) (mailbox : Actor<float * floa
             let! msg = mailbox.Receive()
             if checkConverge (s, w) msg then
                 convCounter <- convCounter + 1
-            s <- fst(msg)/2.0
-            w <- snd(msg)/2.0
+            s <- (s + fst(msg)) / 2.0
+            w <- (w + snd(msg)) / 2.0
+            // Console.WriteLine("Current sum val: {0}", (s/w))
             pushSumSend neighbors (s, w)
 
             // terminate actor if it has converged at sum
-            if convCounter < 3 then
+            if convCounter < 10 then
                 return! loop()
             else
                 mailbox.Context.Parent <! (s/w)
