@@ -3,6 +3,7 @@ module Main
 
 open Gossip
 open System
+open Akka.Actor
 open Akka.FSharp
 
 open System.Collections.Generic
@@ -92,18 +93,16 @@ let impTwoD_network numNodes sqroot =
         neighbors.Add(i, adjArray)
 
 
-let createRefArr(numNodes: int) =
+let createRefArr (numNodes: int) (mailbox : Actor<'a>)=
     
     let actorRefArr = [|
         for i in 0 .. numNodes-1 -> 
-            (spawn system ("worker"+i.ToString()) (gossipActor (neighbors.Item(i))))
+            (spawn mailbox ("worker"+i.ToString()) (gossipActor (neighbors.Item(i))))
     |]
     actorRefArr
 
-let startProtocol (algorithm: string) (numNodes: int) = 
+let startProtocol (algorithm: string) (refArr: IActorRef []) (numNodes: int) = 
     // if algorithm = "gossip" then
-    let refArr = createRefArr(numNodes) 
-
     startGossip refArr "gossip"
            
     // elif algorithm = "push-sum" then
@@ -112,6 +111,22 @@ let startProtocol (algorithm: string) (numNodes: int) =
     // else    
     //     Console.WriteLine("Enter either gossip or push-sum")
 
+let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<'a>)= 
+    let refArr = createRefArr numNodes mailbox
+    startProtocol algorithm refArr numNodes
+    let mutable numHeard = 0
+    let rec loop () = 
+        actor {
+            let! msg = mailbox.Receive()
+            let sender = mailbox.Sender()
+            numHeard <- numHeard + 1
+            if numHeard < numNodes then 
+                // Console.WriteLine("{0} heard the rumor!. ({1})", sender, numHeard)
+                return! loop()
+            else
+                Console.WriteLine("All {0} nodes heard the rumor!", numHeard)
+        }
+    loop()
 
 
 
@@ -149,7 +164,7 @@ let main argv =
 
         let stopWatch = System.Diagnostics.Stopwatch.StartNew()
 
-        startProtocol algorithm numNodes
+        spawn system "listenerActor" (listenerActor algorithm numNodes)
 
         let mutable x = 0
         for i in 0..1000000000 do
