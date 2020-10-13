@@ -96,16 +96,15 @@ let createRefArr(numNodes: int) =
     
     let actorRefArr = [|
         for i in 0 .. numNodes-1 -> 
-
             (spawn system ("worker"+i.ToString()) (gossipActor (neighbors.Item(i))))
     |]
     actorRefArr
 
-let startProtocol(algorithm, numNodes: int) = 
+let startProtocol (algorithm: string) (numNodes: int) = 
     // if algorithm = "gossip" then
-    
-    let actorRefArr = createRefArr(numNodes)
-    startGossip actorRefArr "gossip"
+    let refArr = createRefArr(numNodes) 
+
+    startGossip refArr "gossip"
            
     // elif algorithm = "push-sum" then
     //     Console.WriteLine("Using Push Sum Algorithm")
@@ -150,7 +149,11 @@ let main argv =
 
         let stopWatch = System.Diagnostics.Stopwatch.StartNew()
 
-        startProtocol(algorithm, numNodes)
+        startProtocol algorithm numNodes
+
+        let mutable x = 0
+        for i in 0..1000000000 do
+            x <- i
 
         stopWatch.Stop()
 

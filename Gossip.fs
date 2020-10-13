@@ -12,16 +12,19 @@ let startGossip (actorRefArr: IActorRef[]) rumor =
     let median = actorRefArr.Length/2
     for i in 0..actorRefArr.Length-1 do
         actorRef <- actorRef @ [actorRefArr.[i]]
-    actorRefArr.[median] <! rumor
+    let mutable x = 0
+    Console.WriteLine("Sending initial rumor...")
+    actorRef.[median] <! rumor
     
+let getRandNum min max =
+    let rand = Random()
+    rand.Next(min, max)
 
 let gossipSend (neighbors: int[]) rumor = 
-    Console.WriteLine("gossip_send")
-    let rand = new Random()
-    let index = rand.Next(0, neighbors.Length-1)
+    let index = getRandNum 0 neighbors.Length
     
     let target = actorRef.[index]
-    Console.WriteLine("{0} {1}", index, target)
+    Console.WriteLine("Sending msg to {0}: {1}", index, target)
     target <! rumor
 
 
@@ -30,7 +33,7 @@ let gossipActor (neighbors: int[]) (mailbox : Actor<'a>) =
     // for i in 0..neighbors.Length-1 do
     //     Console.WriteLine("{0}", neighbors.[i])
 
-    Console.WriteLine("heya")
+    Console.WriteLine("Actor started")
 
     let rec loop () = 
         actor {
@@ -38,7 +41,7 @@ let gossipActor (neighbors: int[]) (mailbox : Actor<'a>) =
             gossipSend neighbors msg
             counter <- counter + 1
             if counter < 10 then 
-                // Console.WriteLine("{0} c", counter)
+                Console.WriteLine("counter: {0}", counter)
                 return! loop()
             else
                 Console.WriteLine("done")
