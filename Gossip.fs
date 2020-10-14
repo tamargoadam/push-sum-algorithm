@@ -23,7 +23,7 @@ let getRandNum min max =
 
 let gossipSend (neighbors: int[]) rumor = 
     let index = getRandNum 0 neighbors.Length    
-    let target = actorRef.[index]
+    let target = actorRef.[neighbors.[index]]
     target <! rumor
 
 

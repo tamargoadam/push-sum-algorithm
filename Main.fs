@@ -124,22 +124,28 @@ let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<_>)=
     let refArr = createRefArr algorithm numNodes mailbox
     startProtocol algorithm refArr numNodes
     let mutable numHeard = 0
+    let mutable returnAddress = mailbox.Context.Parent
     let rec loop () = 
         actor {
             let! msg = mailbox.Receive()
             let sender = mailbox.Sender()
-            numHeard <- numHeard + 1
-            if numHeard < numNodes then 
-                if algorithm = "gossip" then
-                    Console.WriteLine("{0} heard the rumor, '{1}'!. ({2})", sender, msg, numHeard)
-                elif algorithm = "push-sum" then
-                    Console.WriteLine("{0} converged to the sum, {1}!. ({2})", sender, msg, numHeard)
-                return! loop()
+            if msg <> "done?" then
+                numHeard <- numHeard + 1
+                if numHeard < numNodes then 
+                    if algorithm = "gossip" then
+                        Console.WriteLine("{0} heard the rumor, '{1}'!. ({2})", sender, msg, numHeard)
+                    elif algorithm = "push-sum" then
+                        Console.WriteLine("{0} converged to the sum, {1}!. ({2})", sender, msg, numHeard)
+                    return! loop()
+                else
+                    if algorithm = "gossip" then
+                        Console.WriteLine("All {0} nodes heard the rumor!", numHeard)
+                    elif algorithm = "push-sum" then
+                        Console.WriteLine("All {0} nodes converged to the sum! (~{1})", numHeard, msg)
+                    returnAddress <! "done!"
             else
-                if algorithm = "gossip" then
-                    Console.WriteLine("All {0} nodes heard the rumor!", numHeard)
-                elif algorithm = "push-sum" then
-                    Console.WriteLine("All {0} nodes converged to the sum! (~{1})", numHeard, msg)
+                returnAddress <- sender
+                return! loop()
         }
     loop()
 
@@ -179,11 +185,8 @@ let main argv =
 
         let stopWatch = System.Diagnostics.Stopwatch.StartNew()
 
-        spawn system "listenerActor" (listenerActor algorithm numNodes) |> ignore
-
-        let mutable x = 0
-        for i in 0..1000000000 do
-            x <- i
+        let listener = spawn system "listenerActor" (listenerActor algorithm numNodes)
+        let res = listener <? "done?" |> Async.RunSynchronously
 
         stopWatch.Stop()
 
