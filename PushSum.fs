@@ -21,11 +21,11 @@ let getRandNum min max =
     rand.Next(min, max)
 
 
-let pushSumSend (neighbors: int[]) rumor = 
+let pushSumSend (neighbors: int[]) rumor (self: IActorRef) = 
     let index = getRandNum 0 neighbors.Length    
     let target = actorRef.[index]
-    // Console.WriteLine("{0}", index)
     target <! rumor
+    self <! rumor
 
 
 
@@ -44,10 +44,13 @@ let pushSumActor (value: float) (neighbors: int[]) (mailbox : Actor<float * floa
             let! msg = mailbox.Receive()
             if checkConverge (s, w) msg then
                 convCounter <- convCounter + 1
-            s <- (s + fst(msg)) / 2.0
-            w <- (w + snd(msg)) / 2.0
+            else
+                convCounter <- 0
+            s <- s + fst(msg)
+            w <- w + snd(msg)
+            
             // Console.WriteLine("Current sum val: {0}", (s/w))
-            pushSumSend neighbors (s, w)
+            pushSumSend neighbors (s/2.0, w/2.0) mailbox.Self
 
             // terminate actor if it has converged at sum
             if convCounter < 10 then
