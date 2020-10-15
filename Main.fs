@@ -120,7 +120,7 @@ let startProtocol (algorithm: string) (refArr: IActorRef []) (numNodes: int) =
     else    
         Console.WriteLine("Enter either gossip or push-sum")
 
-let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<_>)= 
+let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<'a>)= 
     let refArr = createRefArr algorithm numNodes mailbox
     startProtocol algorithm refArr numNodes
     let mutable numHeard = 0
@@ -129,7 +129,10 @@ let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<_>)=
         actor {
             let! msg = mailbox.Receive()
             let sender = mailbox.Sender()
-            if msg <> "done?" then
+            if returnAddress = mailbox.Context.Parent then
+                returnAddress <- sender
+                return! loop()
+            else
                 numHeard <- numHeard + 1
                 if numHeard < numNodes then 
                     if algorithm = "gossip" then
@@ -143,9 +146,6 @@ let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<_>)=
                     elif algorithm = "push-sum" then
                         Console.WriteLine("All {0} nodes converged to the sum! (~{1})", numHeard, msg)
                     returnAddress <! "done!"
-            else
-                returnAddress <- sender
-                return! loop()
         }
     loop()
 

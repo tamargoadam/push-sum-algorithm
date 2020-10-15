@@ -7,7 +7,7 @@ open Akka.FSharp
 let mutable actorRef : IActorRef list = []
 
 let startGossip (actorRefArr: IActorRef[]) rumor = 
-    let median = actorRefArr.Length-1
+    let median = (actorRefArr.Length-1)/2
     // fill actorRef with all actors in network for lookups
     for i in 0..actorRefArr.Length-1 do
         actorRef <- actorRef @ [actorRefArr.[i]]

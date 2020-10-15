@@ -7,7 +7,7 @@ open Akka.FSharp
 let mutable actorRef : IActorRef list = []
 
 let startPushSum (actorRefArr: IActorRef[]) = 
-    let median = actorRefArr.Length-1
+    let median = (actorRefArr.Length-1)/2
     // fill actorRef with all actors in network for lookups
     for i in 0..actorRefArr.Length-1 do
         actorRef <- actorRef @ [actorRefArr.[i]]
@@ -21,49 +21,46 @@ let getRandNum min max =
     rand.Next(min, max)
 
 
-let pushSumSend (neighbors: int[]) rumor (self: IActorRef)= 
+let pushSumSend (neighbors: int[]) rumor = 
     let index = getRandNum 0 neighbors.Length    
     let target = actorRef.[neighbors.[index]]
     target <! rumor
-    self <! rumor
 
 
 
 let checkConverge (oldVals: float * float) (newVals: float * float) = 
     let oldV = fst(oldVals)/snd(oldVals)
     let newV = ((fst(oldVals) + fst(newVals))/2.0)/((snd(oldVals) + snd(newVals))/2.0)
-    oldV - newV < 10.0**(-10.0) && newV - oldV < 10.0**(-10.0)
-
+    abs (oldV - newV) < 10.0**(-10.0)
 
 let pushSumActor (value: float) (neighbors: int[]) (mailbox : Actor<float * float>) =    
     let mutable convCounter = 0
     let mutable s = value
-    let mutable w = 1.0
+    let mutable w = 0.0
 
     let rec loop () = 
         actor {
             let! msg = mailbox.Receive()
 
-            if convCounter = -1 then
-                pushSumSend neighbors (s, w) mailbox.Context.Self
+            if msg = (-1.0, -1.0) then
+                s <- s/2.0
+                w <- 0.5
+                mailbox.Self <! (s, w)
+                return! loop()
 
-
-            // check convergance
             if checkConverge (s, w) msg then
-                convCounter <- convCounter + 1
+                    convCounter <- convCounter + 1
             else
                 convCounter <- 0
-
-            // check for signal to begin push-sum
-            if msg = (-1.0, -1.0) then
-                mailbox.Self <! (s/2.0, w/2.0)
-            else
-                s <- s + fst(msg)
-                w <- w + snd(msg)
-                pushSumSend neighbors (s/2.0, w/2.0) mailbox.Context.Self
+            
+            s <- (s + fst(msg))/2.0
+            w <- (w + snd(msg))/2.0
+            
+            pushSumSend neighbors (s, w)
 
             // terminate actor if it has converged at sum
-            if convCounter < 3 then
+            if convCounter <> 3 then
+                //Console.WriteLine("{0}: {1}", mailbox.Context.Self, (s/w))
                 return! loop()
             else
                 mailbox.Context.Parent <! (s/w)
