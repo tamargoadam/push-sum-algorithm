@@ -110,17 +110,17 @@ let createRefArr (algorithm: string) (numNodes: int) (mailbox : Actor<'a>)=
 
 let startProtocol (algorithm: string) (refArr: IActorRef []) (numNodes: int) = 
     if algorithm = "gossip" then
-        Console.WriteLine("Using Gossip Algorithm")
+        Console.WriteLine("Using Gossip Algorithm...")
         startGossip refArr "rumor"
            
     elif algorithm = "push-sum" then
-        Console.WriteLine("Using Push Sum Algorithm")
+        Console.WriteLine("Using Push Sum Algorithm...")
         startPushSum refArr
 
     else    
         Console.WriteLine("Enter either gossip or push-sum")
 
-let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<'a>)= 
+let supervisorActor (algorithm: string) (numNodes: int) (mailbox : Actor<'a>)= 
     let refArr = createRefArr algorithm numNodes mailbox
     startProtocol algorithm refArr numNodes
     let mutable numHeard = 0
@@ -135,10 +135,10 @@ let listenerActor (algorithm: string) (numNodes: int) (mailbox : Actor<'a>)=
             else
                 numHeard <- numHeard + 1
                 if numHeard < numNodes then 
-                    if algorithm = "gossip" then
-                        Console.WriteLine("{0} heard the rumor, '{1}'!. ({2})", sender, msg, numHeard)
-                    elif algorithm = "push-sum" then
-                        Console.WriteLine("{0} converged to the sum, {1}!. ({2})", sender, msg, numHeard)
+                    // if algorithm = "gossip" then
+                    //     Console.WriteLine("{0} heard the rumor, '{1}'!. ({2})", sender, msg, numHeard)
+                    // elif algorithm = "push-sum" then
+                    //     Console.WriteLine("{0} converged to the sum, {1}!. ({2})", sender, msg, numHeard)
                     return! loop()
                 else
                     if algorithm = "gossip" then
@@ -185,8 +185,8 @@ let main argv =
 
         let stopWatch = System.Diagnostics.Stopwatch.StartNew()
 
-        let listener = spawn system "listenerActor" (listenerActor algorithm numNodes)
-        let res = listener <? "done?" |> Async.RunSynchronously
+        let supervisor = spawn system "supervisorActor" (supervisorActor algorithm numNodes)
+        let res = supervisor <? "done?" |> Async.RunSynchronously
 
         stopWatch.Stop()
 
