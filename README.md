@@ -1,8 +1,8 @@
 # Project 2: Gossip
 
 ####Team Members:
-- Adam Tamargo
-- Sakshi Chhabra
+- Adam Tamargo, 1798-0959
+- Sakshi Chhabra, 1699-9446
 
 ####What is working:
 - Full, 2D, imp2D, line for gossip protocol
