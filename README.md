@@ -1,4 +1,4 @@
-# Gossip and Push-Sum Simulation
+# Gossip and Push-Sum Simulations
 
 #### Command to run: 
 `dotnet run numNodes topology algorithm`
