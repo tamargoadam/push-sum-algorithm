@@ -1,6 +1,6 @@
 # Gossip and Push-Sum Simulations
 
-This program simulates the asynchronous gossip and [push-sum](https://www.cs.cornell.edu/johannes/papers/2003/focs2003-gossip.pdf) algorithms. This implementation uses the actor model of concurrent computation powered by [Akka](https://getakka.net/).
+This program simulates the asynchronous Gossip and [Push-Sum](https://www.cs.cornell.edu/johannes/papers/2003/focs2003-gossip.pdf) algorithms. This implementation uses the actor model of concurrent computation powered by [Akka](https://getakka.net/).
 
 #### Command to run: 
 `dotnet run numNodes topology algorithm`
