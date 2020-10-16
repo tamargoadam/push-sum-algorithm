@@ -1,25 +1,19 @@
-# Project 2: Gossip
+# Gossip and Push-Sum Simulation
 
-####Team Members:
-- Adam Tamargo, 1798-0959
-- Sakshi Chhabra, 1699-9446
-
-####What is working:
-- Full, 2D, imp2D, line for gossip protocol
-- Full, 2D, imp2D, line for push-sum protocol
-
-####Largest network dealt with:
-
-- Gossip protocol:
-  - Full: 10000
-  - Line: 30
-  - 2D: 400
-  - imp2D: 500
-- Push-Sum protocol:
-  - Full: 7000
-  - Line: 5
-  - 2D: 50
-  - imp2D: 400
-
-#####Command to run the project2: 
+#### Command to run: 
 `dotnet run numNodes topology algorithm`
+
+##### Available topologies:
+ - `full`
+   - Every actor is a neighbor of all other actors.
+ - `2D`
+   - Actors form a 2D grid.
+ - `line`
+   - Actors are arranged in a line.
+ - `imp2D`
+   - Actors are arranged in a grid but one random other neighbor
+      is selected from the list of all actors.
+
+##### Available algorithms:
+- `gossip`
+- `push-sum` 
